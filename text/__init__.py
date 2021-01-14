@@ -63,7 +63,6 @@ def text_to_sequence(text, cleaner_names, dictionary=None):
     sequence = sequence[:-1] if sequence[-1] == space[0] else sequence
   return sequence
 
-
 def sequence_to_text(sequence):
   '''Converts a sequence of IDs back to a string'''
   result = ''

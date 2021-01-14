@@ -15,7 +15,7 @@ hyperparameter. Some cleaners are English-specific. You'll typically want to use
 import re
 from unidecode import unidecode
 from .numbers import normalize_numbers
-
+import jamotools
 
 # Regular expression matching whitespace:
 _whitespace_re = re.compile(r'\s+')
@@ -87,4 +87,23 @@ def english_cleaners(text):
   text = expand_numbers(text)
   text = expand_abbreviations(text)
   text = collapse_whitespace(text)
+  return text
+
+def korean_cleaners(text):
+  '''Pipeline for Korean text. Split Korean into Jamo syllables.'''
+  '''
+  global g2p_dict
+
+  try:
+    phoneme = g2p_dict[text]
+  except:
+    phoneme = g2p(text)
+    g2p_dict[text] = phoneme
+  finally:
+    text = phoneme
+
+  text = g2p(text)
+  '''
+  text = jamotools.split_syllables(text, jamo_type="JAMO")
+  text = text.replace('@', '')
   return text
