@@ -7,6 +7,7 @@ import commons
 from utils import load_wav_to_torch, load_filepaths_and_text
 from text import text_to_sequence, cmudict
 from text.symbols import symbols
+import os
 
 
 class TextMelLoader(torch.utils.data.Dataset):
@@ -40,6 +41,7 @@ class TextMelLoader(torch.utils.data.Dataset):
         return (text, mel)
 
     def get_mel(self, filename):
+        npy_filename = filename.replace('.wav', '.npy')
         if not self.load_mel_from_disk:
             audio, sampling_rate = load_wav_to_torch(filename)
             if sampling_rate != self.stft.sampling_rate:
@@ -51,8 +53,18 @@ class TextMelLoader(torch.utils.data.Dataset):
             audio_norm = audio_norm.unsqueeze(0)
             melspec = self.stft.mel_spectrogram(audio_norm)
             melspec = torch.squeeze(melspec, 0)
+        elif not os.path.isfile(npy_filename):
+            audio, sampling_rate = load_wav_to_torch(filename)
+            if sampling_rate != self.stft.sampling_rate:
+                raise ValueError("{} {} SR doesn't match target {} SR".format(
+                    sampling_rate, self.stft.sampling_rate))
+            audio_norm = audio / self.max_wav_value
+            audio_norm = audio_norm.unsqueeze(0)
+            melspec = self.stft.mel_spectrogram(audio_norm)
+            melspec = torch.squeeze(melspec, 0)
+            np.save(npy_filename, melspec)
         else:
-            melspec = torch.from_numpy(np.load(filename))
+            melspec = torch.from_numpy(np.load(npy_filename))
             assert melspec.size(0) == self.stft.n_mel_channels, (
                 'Mel dimension mismatch: given {}, expected {}'.format(
                     melspec.size(0), self.stft.n_mel_channels))

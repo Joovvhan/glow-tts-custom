@@ -14,7 +14,7 @@
     "fp16_run": true
   },
   "data": {
-    "load_mel_from_disk": false,
+    "load_mel_from_disk": true,
     "training_files":"filelists/kss_audio_text_train_filelist.txt",
     "validation_files":"filelists/kss_audio_text_val_filelist.txt",
     "text_cleaners":["korean_cleaners"],
@@ -26,7 +26,7 @@
     "n_mel_channels": 80,
     "mel_fmin": 0.0,
     "mel_fmax": 8000.0,
-    "add_noise": true,
+    "add_noise": false,
     "add_blank": true
   },
   "model": {
