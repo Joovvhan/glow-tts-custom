@@ -40,6 +40,7 @@ print(f'KSS      length mean | {sum(kss_file_lengths)/len(kss_file_lengths)}')
 print(f'Custom   length sum  | {sum(custom_file_lengths)}')
 print(f'Custom   length mean | {sum(custom_file_lengths)/len(custom_file_lengths)}')
 
-
-
-
+# LJSpeech length sum  | 86117.07628117915
+# LJSpeech length mean | 6.573822616883905
+# KSS      length sum  | 46286.282947846
+# KSS      length mean | 3.6009244552548623

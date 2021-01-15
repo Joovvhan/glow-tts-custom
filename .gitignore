@@ -10,3 +10,5 @@ __pycache__
 build
 *.c
 monotonic_align/monotonic_align
+
+generated_files_from_mel/
