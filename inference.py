@@ -1,6 +1,5 @@
 import numpy as np
 import os
-import shutil
 import argparse
 
 import torch
@@ -12,6 +11,7 @@ import utils
 
 import json
 import jamotools
+from glob import glob
 
 if __name__ == "__main__":
 
@@ -19,6 +19,8 @@ if __name__ == "__main__":
     parser.add_argument('-t', type=str, default='안녕, 세상!', help='Script')
     parser.add_argument('-m', type=str, default='kss', help='TTS model name')
     parser.add_argument('-v', type=str, default='', help='Vocoder model name')
+    parser.add_argument('-f', type=str, default='tst_stns.txt', help='Sentence file list')
+    parser.add_argument('-n', type=float, default=0.333, help='Noise scale')
 
     args = parser.parse_args()
 
@@ -32,7 +34,9 @@ if __name__ == "__main__":
     else:
         assert False, f'Language Error [{language}]!'
 
-    tst_stn = args.t
+    # Clear remains
+    for f in glob('./hifi-gan/test_mel_files/*.npy'): os.remove(f)
+    for f in glob('./generated_files_from_mel/*.wav'): os.remove(f)
 
     # model_dir = "./logs/kss/"
     # model_dir = "./logs/ljspeech2/"
@@ -58,31 +62,51 @@ if __name__ == "__main__":
     except AttributeError:
         cmu_dict = None 
 
-    if getattr(hps.data, "add_blank", False):
-        text_norm = text_to_sequence(tst_stn.strip(), [cleaners], cmu_dict)
-        text_norm = commons.intersperse(text_norm, len(symbols))
-    else: # If not using "add_blank" option during training, adding spaces at the beginning and the end of utterance improves quality
-        tst_stn = " " + tst_stn.strip() + " "
-        text_norm = text_to_sequence(tst_stn.strip(), [cleaners], cmu_dict)
-    sequence = np.array(text_norm)[None, :]
-    print("".join([symbols[c] if c < len(symbols) else "<BNK>" for c in sequence[0]]))
-    x_tst = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
-    x_tst_lengths = torch.tensor([x_tst.shape[1]]).cuda()
+    if args.f is None:
+        tst_stns = [('sample.wav', args.t)]
+    else:
+        with open(args.f, 'r') as f:
+            tst_stns = [line.split('|') for line in f]
+    
+    for stn in tst_stns: print(stn)
 
-    with torch.no_grad():
-        noise_scale = .667
-        length_scale = 1.0
-        (y_gen_tst, *_), *_, (attn_gen, *_) = model(x_tst, x_tst_lengths, gen=True, noise_scale=noise_scale, length_scale=length_scale)
+    for file_name, tst_stn in tst_stns:
+                
+        if getattr(hps.data, "add_blank", False):
+            text_norm = text_to_sequence(tst_stn.strip(), [cleaners], cmu_dict)
+            text_norm = commons.intersperse(text_norm, len(symbols))
+        else: # If not using "add_blank" option during training, adding spaces at the beginning and the end of utterance improves quality
+            tst_stn = " " + tst_stn.strip() + " "
+            text_norm = text_to_sequence(tst_stn.strip(), [cleaners], cmu_dict)
+        sequence = np.array(text_norm)[None, :]
+        print("".join([symbols[c] for c in sequence[0] if c < len(symbols)]))
+        # print("".join([symbols[c] if c < len(symbols) else "<BNK>" for c in sequence[0]]))
+        x_tst = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
+        x_tst_lengths = torch.tensor([x_tst.shape[1]]).cuda()
 
-        # save mel-framescd 
-        if not os.path.exists('./hifi-gan/test_mel_files'):
-            os.makedirs('./hifi-gan/test_mel_files')
-        np.save("./hifi-gan/test_mel_files/sample.npy", y_gen_tst.cpu().detach().numpy())
+        with torch.no_grad():
+            # noise_scale = .667
+            # noise_scale = .333
+            noise_scale = args.n
+            length_scale = 1.0
+            (y_gen_tst, *_), *_, (attn_gen, *_) = model(x_tst, x_tst_lengths, gen=True, noise_scale=noise_scale, length_scale=length_scale)
+
+            # save mel-framescd 
+            if not os.path.exists('./hifi-gan/test_mel_files'):
+                os.makedirs('./hifi-gan/test_mel_files')
+
+            mel_file_name = file_name.replace('.wav', '.npy')
+            np.save(f"./hifi-gan/test_mel_files/{mel_file_name}", y_gen_tst.cpu().detach().numpy())
 
     python_script = './hifi-gan/inference_e2e.py'
     # options = f'--checkpoint_file ./runs/{}'
-    options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan/g_00110000' + \
-              f' --input_mels_dir ./hifi-gan/test_mel_files'
+    # options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan/g_00110000' + \
+    #         f' --input_mels_dir ./hifi-gan/test_mel_files'
+    options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan_custom/g_00015000' + \
+            f' --input_mels_dir ./hifi-gan/test_mel_files'
+
     os.system(f'python {python_script} {options}')
-    # shutil.move('./hifi-gan/generated_files_from_mel/sample_generated_e2e.wav', 'wavs')
+        # os.rename('./generated_files_from_mel/sample_generated_e2e.wav', \
+        #          f'./generated_files_from_mel/{file_name}' )
+        # shutil.move('./hifi-gan/generated_files_from_mel/sample_generated_e2e.wav', 'wavs')
     # # "./hifi-gan/generated_files_from_mel/sample_generated_e2e.wav"
