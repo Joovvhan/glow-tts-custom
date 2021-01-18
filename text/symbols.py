@@ -35,8 +35,26 @@ elif language == 'korean':
     for unicode in range(0x11A8, 0x11C3):
         _letters_k += chr(unicode)
 
+    symbols = [_pad] + list(_special) + list(_punctuation) + list(_letters_k)
+
+elif language == 'korean_phoneme':
+    _letters_k = ''
+    for unicode in range(0x1100, 0x1113):
+        _letters_k += chr(unicode)
+    for unicode in range(0x1161, 0x1176):
+        _letters_k += chr(unicode)
+    '''
+    ᆨ 0x11a8
+    ᆫ 0x11ab
+    ᆮ 0x11ae
+    ᆯ 0x11af
+    ᆷ 0x11b7
+    ᆸ 0x11b8
+    ᆼ 0x11bc
+    '''
+    for unicode in [0x11a8, 0x11ab, 0x11ae, 0x11af, 0x11b7, 0x11b8, 0x11bc]:
+        _letters_k += chr(unicode)
+
     # Rule of Seven Jongseong
-    # for unicode in (0x11a8, 0x11ab, 0x11ae, 0x11af, 0x11b7, 0x11b8, 0x11bc):
-    #    _letters_k += chr(unicode)
     symbols = [_pad] + list(_special) + list(_punctuation) + list(_letters_k)
 

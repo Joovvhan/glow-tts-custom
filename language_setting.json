@@ -1,3 +1,3 @@
-{"language": "korean",
- "languages": ["english", "korean_g2p"]}
+{"language": "korean_phoneme",
+ "languages": ["english", "korean", "korean_phoneme"]}
 
