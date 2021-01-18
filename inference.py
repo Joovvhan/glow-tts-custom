@@ -101,9 +101,9 @@ if __name__ == "__main__":
     python_script = './hifi-gan/inference_e2e.py'
     # options = f'--checkpoint_file ./runs/{}'
     # options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan/g_00110000' + \
-    #         f' --input_mels_dir ./hifi-gan/test_mel_files'
+    #           f' --input_mels_dir ./hifi-gan/test_mel_files'
     options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan_custom/g_00015000' + \
-            f' --input_mels_dir ./hifi-gan/test_mel_files'
+              f' --input_mels_dir ./hifi-gan/test_mel_files'
 
     os.system(f'python {python_script} {options}')
         # os.rename('./generated_files_from_mel/sample_generated_e2e.wav', \

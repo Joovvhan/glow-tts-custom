@@ -15,3 +15,5 @@ generated_files_from_mel/
 
 filelists/custom_audio_text_train_filelist.txt
 filelists/custom_audio_text_test_filelist.txt
+
+tst_stns_custom.txt
