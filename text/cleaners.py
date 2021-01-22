@@ -17,7 +17,17 @@ from unidecode import unidecode
 from .numbers import normalize_numbers
 import jamotools
 
+import json
+
+import g2pk
 from g2pk import G2p
+
+# Override Rule 15
+if "korean_phoneme_no_15" == json.load(open("language_setting.json", 'r'))['language']:
+  def dummy_link4(inp, descriptive=False, verbose=False):
+    return inp
+  g2pk.g2pk.link4 = dummy_link4
+
 g2p = G2p()
 g2p_dict = dict()
 
@@ -110,7 +120,7 @@ def korean_phoneme_cleaners(text):
 
   try:
     phoneme = g2p_dict[text]
-  except:
+  except KeyError:
     phoneme = g2p(text, descriptive=True, group_vowels=True)
     g2p_dict[text] = phoneme
   finally:
