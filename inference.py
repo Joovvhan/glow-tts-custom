@@ -12,6 +12,7 @@ import utils
 import json
 import jamotools
 from glob import glob
+import g2pk
 from g2pk import G2p
 g2p = G2p()
 
@@ -34,6 +35,13 @@ if __name__ == "__main__":
         cleaners = 'korean_cleaners'
         args.t = jamotools.split_syllables(args.t, jamo_type="JAMO")
     elif language == 'korean_phoneme':
+        cleaners = 'korean_phoneme_cleaners'
+        args.t = g2p(args.t, descriptive=True, group_vowels=True)
+        args.t = jamotools.split_syllables(args.t, jamo_type="JAMO")
+    elif language  == "korean_phoneme_no_15":
+        def dummy_link3(inp, descriptive=False, verbose=False):
+            return inp
+        g2pk.g2pk.link3 = dummy_link3
         cleaners = 'korean_phoneme_cleaners'
         args.t = g2p(args.t, descriptive=True, group_vowels=True)
         args.t = jamotools.split_syllables(args.t, jamo_type="JAMO")

@@ -24,9 +24,9 @@ from g2pk import G2p
 
 # Override Rule 15
 if "korean_phoneme_no_15" == json.load(open("language_setting.json", 'r'))['language']:
-  def dummy_link4(inp, descriptive=False, verbose=False):
+  def dummy_link3(inp, descriptive=False, verbose=False):
     return inp
-  g2pk.g2pk.link4 = dummy_link4
+  g2pk.g2pk.link3 = dummy_link3
 
 g2p = G2p()
 g2p_dict = dict()
