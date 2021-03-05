@@ -100,14 +100,15 @@ def train(rank, epoch, hps, generator, optimizer_g, train_loader, logger, writer
   global global_step
 
   generator.train()
-  for batch_idx, (x, x_lengths, y, y_lengths) in enumerate(train_loader):
+  for batch_idx, (x, x_lengths, y, y_lengths, sid) in enumerate(train_loader):
     x, x_lengths = x.cuda(rank, non_blocking=True), x_lengths.cuda(rank, non_blocking=True)
     y, y_lengths = y.cuda(rank, non_blocking=True), y_lengths.cuda(rank, non_blocking=True)
+    sid = sid.cuda(rank, non_blocking=True)
 
     # Train Generator
     optimizer_g.zero_grad()
     
-    (z, z_m, z_logs, logdet, z_mask), (x_m, x_logs, x_mask), (attn, logw, logw_) = generator(x, x_lengths, y, y_lengths, gen=False)
+    (z, z_m, z_logs, logdet, z_mask), (x_m, x_logs, x_mask), (attn, logw, logw_) = generator(x, x_lengths, y, y_lengths, g=sid, gen=False)
     l_mle = commons.mle_loss(z, z_m, z_logs, logdet, z_mask)
     l_length = commons.duration_loss(logw, logw_, x_lengths)
 
@@ -154,12 +155,13 @@ def evaluate(rank, epoch, hps, generator, optimizer_g, val_loader, logger, write
     generator.eval()
     losses_tot = []
     with torch.no_grad():
-      for batch_idx, (x, x_lengths, y, y_lengths) in enumerate(val_loader):
+      for batch_idx, (x, x_lengths, y, y_lengths, sid) in enumerate(val_loader):
         x, x_lengths = x.cuda(rank, non_blocking=True), x_lengths.cuda(rank, non_blocking=True)
         y, y_lengths = y.cuda(rank, non_blocking=True), y_lengths.cuda(rank, non_blocking=True)
+        sid = sid.cuda(rank, non_blocking=True)
 
         
-        (z, z_m, z_logs, logdet, z_mask), (x_m, x_logs, x_mask), (attn, logw, logw_) = generator(x, x_lengths, y, y_lengths, gen=False)
+        (z, z_m, z_logs, logdet, z_mask), (x_m, x_logs, x_mask), (attn, logw, logw_) = generator(x, x_lengths, y, y_lengths, g=sid, gen=False)
         l_mle = commons.mle_loss(z, z_m, z_logs, logdet, z_mask)
         l_length = commons.duration_loss(logw, logw_, x_lengths)
 
