@@ -126,7 +126,7 @@ def train(rank, epoch, hps, generator, optimizer_g, train_loader, logger, writer
     
     if rank==0:
       if batch_idx % hps.train.log_interval == 0:
-        (y_gen, *_), *_ = generator.module(x[:1], x_lengths[:1], gen=True)
+        (y_gen, *_), *_ = generator.module(x[:1], x_lengths[:1], g=sid[:1], gen=True)
         logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
           epoch, batch_idx * len(x), len(train_loader.dataset),
           100. * batch_idx / len(train_loader),
