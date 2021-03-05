@@ -1,6 +1,9 @@
 DATASETS
 DUMMY
 DUMMY2
+CUSTOM
+CUSTOM2
+ACRYL
 samples
 logs
 __pycache__
@@ -15,5 +18,11 @@ generated_files_from_mel/
 
 filelists/custom_audio_text_train_filelist.txt
 filelists/custom_audio_text_test_filelist.txt
+filelists/acryl_audio_text_test_filelist.txt
+filelists/acryl_audio_text_train_filelist.txt
+filelists/sony_audio_text_test_filelist.txt
+filelists/sony_audio_text_train_filelist.txt
+
+configs/
 
 tst_stns_custom.txt
