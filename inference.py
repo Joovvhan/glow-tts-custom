@@ -118,6 +118,12 @@ if __name__ == "__main__":
     if 'kss' in args.m:
         options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan/g_00110000' + \
                   f' --input_mels_dir ./hifi-gan/test_mel_files'
+    elif 'sony' in args.m:
+        options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan_sony/g_00420000' + \
+                  f' --input_mels_dir ./hifi-gan/test_mel_files'        
+    elif 'acryl' in args.m:
+        options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan_acryl/g_01410000' + \
+                  f' --input_mels_dir ./hifi-gan/test_mel_files'        
     else:
         options = f'--checkpoint_file ./hifi-gan/runs/cp_hifigan_custom/g_00015000' + \
                   f' --input_mels_dir ./hifi-gan/test_mel_files'
